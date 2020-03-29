@@ -1,0 +1,46 @@
+{
+  "name": "danialpanah/webpay",
+  "type": "library",
+  "description": "Laravel Package for Processing Online Payments Through Webpay Payment Gateway",
+  "keywords": [
+    "gateway",
+    "api",
+    "rest",
+    "web service",
+    "webpay",
+    "webpay bahamta",
+    "laravel webpay"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Danial Panah",
+      "email": "me@danialrp.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "DanialPanah\\WebPay\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "DanialPanah\\Webpay\\Tests\\": "tests"
+    }
+  },
+  "require": {},
+  "require-dev": {
+    "orchestra/testbench": "^4.0",
+    "phpunit/phpunit": "^8.5"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "DanialPanah\\WebPay\\WebpayServiceProvider"
+      ],
+      "aliases": {
+        "WebPay": "DanialPanah\\WebPay\\Facades\\Webpay"
+      }
+    }
+  }
+}
