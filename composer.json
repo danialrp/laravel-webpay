@@ -28,7 +28,9 @@
       "DanialPanah\\Webpay\\Tests\\": "tests"
     }
   },
-  "require": {},
+  "require": {
+    "guzzlehttp/guzzle": "^6.5"
+  },
   "require-dev": {
     "orchestra/testbench": "^4.0",
     "phpunit/phpunit": "^8.5"
