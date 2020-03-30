@@ -8,5 +8,5 @@
 
 return [
     'api_key' => env('WEBPAY_API_KEY', ''),
-    'callback_url' => env('WEBPAY_CALLBACK_URL')
+    'callback_url' => env('WEBPAY_CALLBACK_URL', '')
 ];
