@@ -8,30 +8,28 @@ use Psr\Http\Message\ResponseInterface;
 
 class HttpClient
 {
-    private static $apiUrl = 'https://webpay.bahamta.com/api/create_request/';
-
-    private static $query = [];
-
     /**
+     * @param $url
+     * @param array $query
      * @return ResponseInterface
      */
-    private static function createHttpRequest(): ResponseInterface
+    private static function createHttpRequest($url, array $query = []): ResponseInterface
     {
-        return (new Client())->request('GET', static::$apiUrl, static::$query);
-    }
-
-    /**
-     * @param array $query
-     * @return mixed
-     */
-    public static function sendHttpRequest($query = []): array
-    {
-        static::$query = $query;
         try {
-            return json_decode(static::createHttpRequest()->getBody());
+            return (new Client())->request('GET', $url, $query);
         } catch (ClientException $exception) {
             throw $exception;
         }
+    }
+
+    /**
+     * @param $url
+     * @param $query
+     * @return mixed
+     */
+    public static function sendHttpRequest($url, array $query = []): array
+    {
+        return json_decode(static::createHttpRequest($url, $query)->getBody());
     }
 
 }
