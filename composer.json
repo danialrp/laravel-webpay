@@ -25,7 +25,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "DanialPanah\\Webpay\\Tests\\": "tests"
+      "DanialPanah\\WebPay\\Tests\\": "tests"
     }
   },
   "require": {
