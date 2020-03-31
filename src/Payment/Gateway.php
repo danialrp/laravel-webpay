@@ -19,7 +19,7 @@ class Gateway
      *
      * @var string
      */
-    private $reference;
+    private $referenceNumber;
 
     /**
      * Payer mobile number
@@ -59,36 +59,48 @@ class Gateway
     /**
      * Gateway constructor.
      * @param array $options
+     * @throws WebpayException
      */
     public function __construct(array $options)
     {
-        $this->setupDefaultValues($options);
-    }
-
-    private function setupDefaultValues(array $options): void
-    {
-        [
-            'amount' ?? null => $this->amount,
-            'reference' ?? null => $this->reference,
-            'payer_mobile' ?? '' => $this->payerMobile,
-            'cards' ?? '' => $this->trustedCards
-        ] = $options;
-
         static::$callbackUrl = config('webpay.callback_url') ?? null;
         static::$apiKey = config('webpay.api_key') ?? null;
 
-        $this->validateDefaultValues();
+        $this->setupDefaultValues($options);
+    }
+
+    /**
+     * @param array $options
+     * @throws WebpayException
+     */
+    private function setupDefaultValues(array $options): void
+    {
+        $this->validateDefaultValues($options);
+
+        [
+            'amount' => $this->amount,
+            'reference_number' => $this->referenceNumber
+        ] = $options;
+
+        if (array_key_exists('payer_mobile', $options)) {
+            $this->setPayerMobile($options['payer_mobile']);
+        }
+
+        if (array_key_exists('cards', $options)) {
+            $this->setTrustedCards($options['cards']);
+        }
     }
 
 
     /**
+     * @param array $options
      * @throws WebpayException
      */
-    private function validateDefaultValues(): void
+    private function validateDefaultValues(array $options): void
     {
         $values = [
-            'amount' => $this->amount,
-            'reference' => $this->reference,
+            'amount' => array_key_exists('amount', $options) ? $options['amount'] : null,
+            'reference' => array_key_exists('reference_number', $options) ? $options['reference_number'] : null,
             'callback_url' => static::$callbackUrl,
             'api_key' => static::$apiKey
         ];
@@ -111,7 +123,7 @@ class Gateway
                 'api_key' => static::$apiKey,
                 'callback_url' => static::$callbackUrl,
                 'amount_irr' => $this->amount,
-                'reference' => $this->reference,
+                'reference' => $this->referenceNumber,
                 'payer_mobile' => $this->payerMobile,
                 'trusted_pan' => $this->trustedCards
             ]
@@ -122,6 +134,7 @@ class Gateway
     /**
      * @param array $params
      * @return Gateway
+     * @throws WebpayException
      */
     public static function initiatePayment(array $params = []): Gateway
     {
@@ -148,11 +161,11 @@ class Gateway
     }
 
     /**
-     * @param string $reference
+     * @param string $referenceNumber
      */
-    public function setReference(string $reference): void
+    public function setReferenceNumber(string $referenceNumber): void
     {
-        $this->reference = $reference;
+        $this->referenceNumber = $referenceNumber;
     }
 
     /**

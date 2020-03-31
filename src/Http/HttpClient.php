@@ -29,7 +29,7 @@ class HttpClient
      */
     public static function sendHttpRequest($url, array $query = []): array
     {
-        return json_decode(static::createHttpRequest($url, $query)->getBody());
+        return (array)json_decode(static::createHttpRequest($url, $query)->getBody());
     }
 
 }
