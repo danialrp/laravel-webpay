@@ -63,7 +63,7 @@ class Gateway
      */
     public function __construct(array $options)
     {
-        static::$callbackUrl = config('webpay.callback_url') ?? null;
+        static::$callbackUrl = url('/') . config('webpay.callback_url') ?? null;
         static::$apiKey = config('webpay.api_key') ?? null;
 
         $this->setupDefaultValues($options);
@@ -130,28 +130,6 @@ class Gateway
         ];
     }
 
-
-    /**
-     * @param array $params
-     * @return Gateway
-     * @throws WebpayException
-     */
-    public static function initiatePayment(array $params = []): Gateway
-    {
-        $instance = new static($params);
-        return $instance;
-    }
-
-    /**
-     * Send request to gateway
-     *
-     * @return array|mixed
-     */
-    public function send()
-    {
-        return HttpClient::sendHttpRequest(static::$apiUrl, $this->makeQueryArray());
-    }
-
     /**
      * @param int $amount
      */
@@ -183,6 +161,47 @@ class Gateway
     {
         $trustedCards = (array)$trustedCards;
         $this->trustedCards = implode(',', $trustedCards);
+    }
+
+    /**
+     * @param array $params
+     * @return Gateway
+     * @throws WebpayException
+     */
+    public static function initiatePayment(array $params): Gateway
+    {
+        $instance = new static($params);
+        return $instance;
+    }
+
+    /**
+     * Send request to gateway
+     *
+     * @return array|mixed
+     * @throws WebpayException
+     */
+    public function send()
+    {
+        return $this->getPaymentUrl(HttpClient::sendHttpRequest(static::$apiUrl, $this->makeQueryArray()));
+    }
+
+    /**
+     * @param array $response
+     * @return mixed
+     * @throws WebpayException
+     */
+    private function getPaymentUrl(array $response)
+    {
+        if (!array_key_exists('ok', $response)) {
+            throw new WebpayException('invalid response received from gateway server');
+        }
+
+        if (!$response['ok'] === true) {
+            throw new WebpayException('Webpay Api Error: ' . $response['error']);
+        }
+
+        $webpayUrl = (array)$response['result'];
+        return $webpayUrl['payment_url'];
     }
 }
 
