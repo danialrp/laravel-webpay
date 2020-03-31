@@ -3,7 +3,7 @@
 namespace DanialPanah\WebPay\Payment;
 
 use DanialPanah\WebPay\Http\HttpClient;
-use http\Exception\InvalidArgumentException;
+use DanialPanah\WebPay\Exceptions\WebpayException;
 
 class Gateway
 {
@@ -31,7 +31,7 @@ class Gateway
     /**
      * Trusted payer card number(s)
      *
-     * @var string
+     * @var array|string
      */
     private $trustedCards;
 
@@ -54,7 +54,7 @@ class Gateway
      *
      * @var string
      */
-    private static $apiUrl = 'https://webpay.bahamta.com/api/create_request/';
+    private static $apiUrl = 'https://webpay.bahamta.com/api/create_request';
 
     /**
      * Gateway constructor.
@@ -71,16 +71,19 @@ class Gateway
             'amount' ?? null => $this->amount,
             'reference' ?? null => $this->reference,
             'payer_mobile' ?? '' => $this->payerMobile,
-            'cards' ?? '' => $this->trustedCards //TODO cast to string for string|array
+            'cards' ?? '' => $this->trustedCards
         ] = $options;
 
         static::$callbackUrl = config('webpay.callback_url') ?? null;
         static::$apiKey = config('webpay.api_key') ?? null;
-        
+
         $this->validateDefaultValues();
     }
 
 
+    /**
+     * @throws WebpayException
+     */
     private function validateDefaultValues(): void
     {
         $values = [
@@ -89,10 +92,10 @@ class Gateway
             'callback_url' => static::$callbackUrl,
             'api_key' => static::$apiKey
         ];
-        
+
         foreach ($values as $key => $value) {
-            if(!$value)
-                throw new InvalidArgumentException($key . ' is not set.');
+            if (!$value)
+                throw new WebpayException($key . ' is not set.');
         }
     }
 
@@ -120,7 +123,7 @@ class Gateway
      * @param array $params
      * @return Gateway
      */
-    public static function initiatePayment(array $params = []) : Gateway
+    public static function initiatePayment(array $params = []): Gateway
     {
         $instance = new static($params);
         return $instance;
@@ -134,6 +137,39 @@ class Gateway
     public function send()
     {
         return HttpClient::sendHttpRequest(static::$apiUrl, $this->makeQueryArray());
+    }
+
+    /**
+     * @param int $amount
+     */
+    public function setAmount(int $amount): void
+    {
+        $this->amount = $amount;
+    }
+
+    /**
+     * @param string $reference
+     */
+    public function setReference(string $reference): void
+    {
+        $this->reference = $reference;
+    }
+
+    /**
+     * @param string $payerMobile
+     */
+    public function setPayerMobile(string $payerMobile): void
+    {
+        $this->payerMobile = $payerMobile;
+    }
+
+    /**
+     * @param array|string $trustedCards
+     */
+    public function setTrustedCards($trustedCards): void
+    {
+        $trustedCards = (array)$trustedCards;
+        $this->trustedCards = implode(',', $trustedCards);
     }
 }
 
