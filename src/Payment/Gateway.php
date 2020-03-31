@@ -4,110 +4,136 @@ namespace DanialPanah\WebPay\Payment;
 
 use DanialPanah\WebPay\Http\HttpClient;
 use http\Exception\InvalidArgumentException;
-use Illuminate\Config\Repository;
 
 class Gateway
 {
+    /**
+     * Amount to pay
+     *
+     * @var int
+     */
+    private $amount;
+
+    /**
+     * Unique transaction number
+     *
+     * @var string
+     */
+    private $reference;
+
+    /**
+     * Payer mobile number
+     *
+     * @var string
+     */
+    private $payerMobile;
+
+    /**
+     * Trusted payer card number(s)
+     *
+     * @var string
+     */
+    private $trustedCards;
+
+    /**
+     * Webpay api key
+     *
+     * @var string
+     */
+    private static $apiKey;
+
+    /**
+     * Redirection url
+     *
+     * @var string
+     */
+    private static $callbackUrl;
+
     /**
      * payment api url
      *
      * @var string
      */
-    private static $apiUrl= 'https://webpay.bahamta.com/api/create_request/';
-
+    private static $apiUrl = 'https://webpay.bahamta.com/api/create_request/';
 
     /**
-     * Query parameter
-     *
+     * Gateway constructor.
      * @param array $options
+     */
+    public function __construct(array $options)
+    {
+        $this->setupDefaultValues($options);
+    }
+
+    private function setupDefaultValues(array $options): void
+    {
+        [
+            'amount' ?? null => $this->amount,
+            'reference' ?? null => $this->reference,
+            'payer_mobile' ?? '' => $this->payerMobile,
+            'cards' ?? '' => $this->trustedCards //TODO cast to string for string|array
+        ] = $options;
+
+        static::$callbackUrl = config('webpay.callback_url') ?? null;
+        static::$apiKey = config('webpay.api_key') ?? null;
+        
+        $this->validateDefaultValues();
+    }
+
+
+    private function validateDefaultValues(): void
+    {
+        $values = [
+            'amount' => $this->amount,
+            'reference' => $this->reference,
+            'callback_url' => static::$callbackUrl,
+            'api_key' => static::$apiKey
+        ];
+        
+        foreach ($values as $key => $value) {
+            if(!$value)
+                throw new InvalidArgumentException($key . ' is not set.');
+        }
+    }
+
+    /**
+     * Make payment details array
+     *
      * @return array
      */
-    private function queryPayload(array $options = [])
+    private function makeQueryArray(): array
     {
         return [
             'query' => [
-                'api_key' => self::apiKey(),
-                'callback_url' => self::callbackUrl(),
-                'reference' => self::reference($options['reference'] ?? ''),
-                'amount_irr' => self::amount($options['amount'] ?? ''),
-                'payer_mobile' => (string)$options['payer_mobile'] ?? '',
-                'trusted_pan' => self::trustedCards($options['trusted_cards'] ?? '')
+                'api_key' => static::$apiKey,
+                'callback_url' => static::$callbackUrl,
+                'amount_irr' => $this->amount,
+                'reference' => $this->reference,
+                'payer_mobile' => $this->payerMobile,
+                'trusted_pan' => $this->trustedCards
             ]
         ];
     }
 
-    /**
-     * Set api key from config key
-     *
-     * @return Repository|mixed
-     */
-    private function apiKey(): string
-    {
-        $apiKey = config('webpay.api_key');
-        if(isset($apiKey))
-            return $apiKey;
-
-        throw new InvalidArgumentException('api key is not set.');
-    }
-
-    /**
-     * Set callback url from config key
-     *
-     * @return Repository|mixed
-     */
-    private function callbackUrl(): string
-    {
-        $callbackUrl = config('webpay.callback_url');
-        if(isset($callbackUrl))
-            return $callbackUrl;
-
-        throw new InvalidArgumentException('callback url is not set.');
-    }
-
-    /**
-     * @param string $reference
-     * @return string
-     */
-    protected static function reference($reference): string
-    {
-        if(empty($reference)) {
-            throw new InvalidArgumentException('invalid reference value provided');
-        }
-
-        return (string)$reference;
-    }
-
-    /**
-     * @param $amount
-     * @return int
-     */
-    protected static function amount($amount): int
-    {
-        if(empty($amount)) {
-            throw new InvalidArgumentException('invalid amount value provided');
-        }
-
-        return (int)$amount;
-    }
-
-    /**
-     * Receive cards in string or array
-     *
-     * @param $trustedCards
-     * @return string
-     */
-    protected static function trustedCards($trustedCards): string
-    {
-        $trustedCards = (array)$trustedCards;
-        return implode(',', $trustedCards);
-    }
 
     /**
      * @param array $params
+     * @return Gateway
+     */
+    public static function initiatePayment(array $params = []) : Gateway
+    {
+        $instance = new static($params);
+        return $instance;
+    }
+
+    /**
+     * Send request to gateway
+     *
      * @return array|mixed
      */
-    public function initiatePayment(array $params = [])
+    public function send()
     {
-        return HttpClient::sendHttpRequest(static::$apiUrl, $this->queryPayload($params));
+        return HttpClient::sendHttpRequest(static::$apiUrl, $this->makeQueryArray());
     }
 }
+
