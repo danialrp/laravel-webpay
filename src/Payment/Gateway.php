@@ -170,8 +170,7 @@ class Gateway
      */
     public static function initiatePayment(array $params): Gateway
     {
-        $instance = new static($params);
-        return $instance;
+        return new static($params);
     }
 
     /**
