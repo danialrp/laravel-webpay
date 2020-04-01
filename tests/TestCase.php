@@ -16,9 +16,19 @@ use Faker\Generator;
 class TestCase extends \Orchestra\Testbench\TestCase
 {
     /**
-     * @var Generator A Faker fake data generator.
+     * A Faker fake data generator.
+     *
+     * @var Generator
      */
     protected $faker;
+
+    /**
+     * sample Query for api request
+     *
+     * @var array
+     */
+    protected $samplePayment;
+
 
     public function setUp(): void
     {

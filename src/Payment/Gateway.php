@@ -63,7 +63,7 @@ class Gateway
      */
     public function __construct(array $options)
     {
-        static::$callbackUrl = url('/') . config('webpay.callback_url') ?? null;
+        static::$callbackUrl = config('webpay.callback_url') ?? null;
         static::$apiKey = config('webpay.api_key') ?? null;
 
         $this->setupDefaultValues($options);
@@ -121,7 +121,7 @@ class Gateway
         return [
             'query' => [
                 'api_key' => static::$apiKey,
-                'callback_url' => static::$callbackUrl,
+                'callback_url' => url('/') . static::$callbackUrl,
                 'amount_irr' => $this->amount,
                 'reference' => $this->referenceNumber,
                 'payer_mobile' => $this->payerMobile,
