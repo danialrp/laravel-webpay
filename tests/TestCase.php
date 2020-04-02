@@ -29,6 +29,13 @@ class TestCase extends \Orchestra\Testbench\TestCase
      */
     protected $samplePayment;
 
+    /**
+     * sample payment details
+     *
+     * @var array
+     */
+    protected $sampleVerify;
+
 
     public function setUp(): void
     {
