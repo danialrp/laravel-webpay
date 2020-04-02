@@ -104,7 +104,7 @@ class Verify
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function send()
     {
@@ -113,7 +113,7 @@ class Verify
 
     /**
      * @param array $response
-     * @return string
+     * @return array
      */
     private function getVerifyResult(array $response): array
     {

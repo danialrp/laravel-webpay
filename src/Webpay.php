@@ -20,7 +20,7 @@ class Webpay
 
     /**
      * @param array $options
-     * @return string
+     * @return array
      * @throws Exceptions\VerifyException
      */
     public function verifyPayment(array $options)
