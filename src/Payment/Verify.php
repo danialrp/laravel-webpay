@@ -65,7 +65,7 @@ class Verify
             }
         }
 
-
+        $this->setProperValues($options);
     }
 
     /**
@@ -111,6 +111,10 @@ class Verify
         return $this->getVerifyResult(HttpClient::sendHttpRequest(static::$verifyUrl, $this->makeQueryArray()));
     }
 
+    /**
+     * @param array $response
+     * @return string
+     */
     private function getVerifyResult(array $response): string
     {
         return 'response';
