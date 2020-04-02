@@ -21,29 +21,25 @@ class GatewayTest extends TestCase
     {
         parent::setUp();
 
+        $this->proper_config();
+
         $this->samplePayment = [
-                'amount' => $this->faker->randomNumber(4),
-                'reference_number' => $this->faker->text(10),
-                'payer_mobile' => '',
-                'cards' => ''
+            'amount' => $this->faker->randomNumber(4),
+            'reference_number' => $this->faker->text(10),
+            'payer_mobile' => '',
+            'cards' => ''
         ];
     }
 
-    public function proper_config_api_key()
+    public function proper_config()
     {
         Config::set('webpay.api_key', $this->faker->text(30));
-    }
-
-    public function proper_config_callback_url()
-    {
         Config::set('webpay.callback_url', '/payment/test');
     }
 
     public function test_api_key()
     {
         Config::set('webpay.api_key', null);
-
-        $this->proper_config_callback_url();
 
         $this->expectException(WebpayException::class);
         $this->expectExceptionMessage('api_key is not set.');
@@ -53,8 +49,6 @@ class GatewayTest extends TestCase
 
     public function test_callback_url()
     {
-        $this->proper_config_api_key();
-
         Config::set('webpay.callback_url', null);
 
         $this->expectException(WebpayException::class);
@@ -65,9 +59,6 @@ class GatewayTest extends TestCase
 
     public function test_amount_irr()
     {
-        $this->proper_config_api_key();
-        $this->proper_config_callback_url();
-
         $this->samplePayment['amount'] = null;
 
         $this->expectException(WebpayException::class);
@@ -78,14 +69,59 @@ class GatewayTest extends TestCase
 
     public function test_reference_number()
     {
-        $this->proper_config_api_key();
-        $this->proper_config_callback_url();
-
         $this->samplePayment['reference_number'] = null;
 
         $this->expectException(WebpayException::class);
         $this->expectExceptionMessage('reference is not set.');
 
         Webpay::sendPayment($this->samplePayment);
+    }
+
+    public function test_payer_mobile()
+    {
+        $payerMobile = $this->faker->phoneNumber;
+
+        $gateway = new Gateway($this->samplePayment);
+        $gateway->setPayerMobile($payerMobile);
+
+        $that = $this;
+
+        $assertEqual = function () use ($that, $payerMobile) {
+            $that->assertEquals($payerMobile, $this->payerMobile);
+        };
+
+        $doAssertEqual = $assertEqual->bindTo($gateway, get_class($gateway));
+        $doAssertEqual();
+    }
+
+    public function test_trusted_cards()
+    {
+        $trustedCards = [];
+        for($i=0; $i<5; $i++) {
+            $trustedCards [] = $this->faker->creditCardNumber;
+        }
+
+        $gateway = new Gateway($this->samplePayment);
+        $gateway->setTrustedCards($trustedCards);
+
+        $that = $this;
+
+        $assertEqual = function () use ($that, $trustedCards) {
+            $that->assertEquals(implode(',', $trustedCards), $this->trustedCards);
+        };
+
+        $doAssertEqual = $assertEqual->bindTo($gateway, get_class($gateway));
+        $doAssertEqual();
+
+        $trustedCard = $this->faker->creditCardNumber;
+
+        $gateway->setTrustedCards($trustedCard);
+
+        $assertEqual = function () use($that, $trustedCard) {
+            $that->assertEquals($trustedCard, $this->trustedCards);
+        };
+
+        $doAssertEqual = $assertEqual->bindTo($gateway, get_class($gateway));
+        $doAssertEqual();
     }
 }
