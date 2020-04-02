@@ -115,8 +115,8 @@ class Verify
      * @param array $response
      * @return string
      */
-    private function getVerifyResult(array $response): string
+    private function getVerifyResult(array $response): array
     {
-        return 'response';
+        return $response;
     }
 }
