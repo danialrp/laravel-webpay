@@ -164,6 +164,7 @@ class PaymentController extends Controller
 
     /**
      * @param Request $request
+     * @throws VerifyException
      */
     public function verify(Request $request)
     {
