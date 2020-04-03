@@ -1,4 +1,4 @@
-# Laravel Farapayamak
+# Laravel Webpay Payment Gateway (Bahamta)
 
 [![Build Status](https://travis-ci.org/danialrp/laravel-webpay.svg?branch=master)](https://travis-ci.org/github/danialrp/laravel-webpay)
 [![Latest Release on Packagist](https://img.shields.io/packagist/v/danialpanah/webpay.svg?style=flat-square)](https://packagist.org/packages/danialpanah/webpay)
@@ -9,13 +9,13 @@
 - [Configuration](#configuration)
 - [Usage](#usage)
 - [Support & Security](#support-security)
-- [Webpay Official Documentation](https://farapayamak.ir/content/webservice)
+- [Webpay Official Documentation](https://webpay.bahamta.com/doc/api)
 - [License](#license)
 
 <a name="introduction"></a>
 ## Introduction
 
-Laravel package for connecting and accept payments via Webpay gateway in your Laravel application.
+Laravel package for connecting and accept payments via Webpay payment gateway in your Laravel application.
 
 <a name="installation"></a>
 ## Installation
@@ -141,9 +141,13 @@ use DanialPanah\WebPay\Facades\Webpay;
 
 class PaymentController extends Controller
 {
-    public function pay()
+    /**
+     * @return RedirectResponse|Redirector
+     * @throws WebpayException
+     */    
+     public function pay()
     {
-        $userTrustedCards = ['6219196262191962', '3378783333787833'];
+        $userTrustedCards = ['6219196262191962', '6104046161040461'];
 
         $samplePayment = [
            'amount' => 10000,
@@ -184,7 +188,7 @@ class PaymentController extends Controller
 <a name="support-security"></a>
 ## Support & Security
 
-This package supports Laravel 5.1 or greater, 6.x and 7.x
+This package supports Laravel 5.1 or greater, 6.x and 7.x with PHP 7.2 and above.
 * In case of discovering any issues, please create one on the [Issues](https://github.com/danialrp/laravel-webpay/issues) section.
 * For contribution, fork this repo and implements your code then create a PR.
 
