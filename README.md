@@ -43,7 +43,7 @@ DanialPanah\Webpay\WebpayServiceProvider::class
 
 * Run the following command to publish the configuration file:
 ```bash
-php artisan vendor:publish --provider "DanialPanah\Webpay\WebpaykServiceProvider"
+php artisan vendor:publish --provider "DanialPanah\Webpay\WebpayServiceProvider"
 ```
 
 * **config/webpay.php**
@@ -56,7 +56,7 @@ return [
 
 * Add this to `.env.example` and `.env` files:
 ```
-#Webpay API key and settings
+#Webpay API key and Settings
 
 #your webpay api key e.g "webpay:2bbc6c62-4fe..."
 WEBPAY_API_KEY=
@@ -68,7 +68,7 @@ WEBPAY_CALLBACK_URL=
 <a name="usage"></a>
 ## Usage
 
-Following are some approaches which you can have initiate a payment through Webpay package:
+Following are some approaches which you can have for initiate a payment through Webpay package:
 
 * Initiate Payment and Receive the Payment URL:
 ```
@@ -174,7 +174,7 @@ class PaymentController extends Controller
             //Transactions was not successful
         }
 
-        //Do somthing for successful transactoin
+        //Do something for successful transactoin
 
     }
 }
