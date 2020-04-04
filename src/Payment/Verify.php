@@ -73,10 +73,7 @@ class Verify
      */
     private function setProperValues(array $values): void
     {
-        [
-            'amount' => $this->amount,
-            'reference_number' => $this->referenceNumber
-        ] = $values;
+        ['amount' => $this->amount, 'reference_number' => $this->referenceNumber] = $values;
     }
 
     /**
