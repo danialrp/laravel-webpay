@@ -77,10 +77,7 @@ class Gateway
     {
         $this->validateDefaultValues($options);
 
-        [
-            'amount' => $this->amount,
-            'reference_number' => $this->referenceNumber
-        ] = $options;
+        ['amount' => $this->amount, 'reference_number' => $this->referenceNumber] = $options;
 
         if (array_key_exists('payer_mobile', $options)) {
             $this->setPayerMobile($options['payer_mobile']);
